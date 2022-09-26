@@ -1,0 +1,32 @@
+{% extends "admin/change_form.html" %}
+{%  load i18n %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .paid {
+      background: #AAA;
+    }
+    .not-paid {
+      background: #F99;
+    }
+  </style>
+{% endblock %}
+
+
+{% block object-tools %}
+
+  {% if has_add_permission %}
+  <ul class="object-tools">
+    {% block object-tools-items %}
+      <li>
+        {% if original.pk %}
+        <a class="historylink" style="background:{% if adminform.form.instance.payment.status == 'paid' %}#FAA{% else %}#AAA{% endif %}"
+           href="{% url 'get_confirmed' original.pk %}">{% trans "Confirm" %}</a>
+        {% endif %}
+      </li>
+      {{ block.super }}
+    {% endblock %}
+  </ul>
+  {% endif %}
+{% endblock %}
