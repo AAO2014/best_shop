@@ -24,6 +24,6 @@ class PaymentViewSet(viewsets.ModelViewSet):
         if not order.exists():
             raise ValueError(INSTANCE_DOES_NOT_EXISTS)
         money = order.first().total_money
-        Payment.objects.create(**serializer.data, order_id=serializer.initial_data['order'], amount=money, )
+        payment = Payment.objects.create(**serializer.data, order_id=serializer.initial_data['order'], amount=money, )
         headers = self.get_success_headers(serializer.data)
-        return Response('OK', status=status.HTTP_201_CREATED, headers=headers)
+        return Response(data={'payment_id': payment.id}, status=status.HTTP_201_CREATED, headers=headers)
