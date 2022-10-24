@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
-from best_shop.api_const import INSTANCE_DOES_NOT_EXISTS
+from best_shop.api_const import INSTANCE_DOES_NOT_EXISTS, ORDER_API_KEY
 from orders.models import Order
 from .models import Payment
 from .serializers import PaymentSerializer
@@ -15,15 +15,16 @@ class PaymentViewSet(viewsets.ModelViewSet):
         """
         Creates a payment instance
 
-        Required keys: order id value (int type)
+        Required keys: order id value (int type), for key look in ORDER_API_KEY
         Optional keys: status and type (please see Payment model for valid values)
         """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        order = Order.objects.filter(id=request.data['order'])
+        order = Order.objects.filter(id=request.data[ORDER_API_KEY])
         if not order.exists():
             raise ValueError(INSTANCE_DOES_NOT_EXISTS)
         money = order.first().total_money
-        payment = Payment.objects.create(**serializer.data, order_id=serializer.initial_data['order'], amount=money, )
+        payment = Payment.objects.create(
+            **serializer.data, order_id=serializer.initial_data[ORDER_API_KEY], amount=money, )
         headers = self.get_success_headers(serializer.data)
         return Response(data={'payment_id': payment.id}, status=status.HTTP_201_CREATED, headers=headers)
